@@ -1,19 +1,16 @@
-module.exports = {
-    con:  function () {
+import { createPool } from 'mysql2/promise';
+import {
+  DB_HOST,
+  DB_NAME,
+  DB_PASSWORD,
+  DB_PORT,
+  DB_USER
+} from './config.js'
 
-        var mysql = require('mysql2'); // se incluye la libreria de sql 
-
-
-        // se almacenan credenciales de acceso a DB
-        const credentialsdb = {
-            host: "localhost", 
-            user: "root",
-            password: "123456789",
-            database: "biancadb"
-
-          }
-
-        // se devuelve coneccion inicializada
-        return (mysql.createConnection(credentialsdb))
-    }
-  };
+export const pool = createPool({
+  user: DB_USER,
+  password: DB_PASSWORD,
+  host: DB_HOST, 
+  port: DB_PORT,
+  database: DB_NAME
+})
