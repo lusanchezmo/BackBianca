@@ -14,6 +14,7 @@ app.use(express.json())
 app.use(
   cors({
     origin: "https://lusanchezmo.github.io", // allow requests only from this origin
+    origin: "http://localhost:3000"
   })
 );
 
@@ -85,6 +86,19 @@ app.get('/redistributionI2', async (req, res) => {
     res.status(500).send('Error en la consulta');
   }
 });
+
+app.post('/addApto/:nombre/:torre/:ingruma', async (req, res) => {
+  const { nombre, torre, ingruma} = req.params;
+
+  try {
+    const result = await pool.query(`insert into ingruma2 (apto,idapto) values (${nombre},'${nombre}.${torre}.${ingruma}');`);
+    res.send('correcto');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error en la consulta');
+  }
+});
+
 
 app.listen(PORT);
 console.log("Server on port ", PORT)
