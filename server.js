@@ -20,11 +20,13 @@ app.use(
 
 
 // consulta inicial 
-app.get('/', async (req, res) => {
+app.post('/:ingruma', async (req, res) => {
+  const {ingruma} = req.params;
   try {
-    const [rows] = await pool.query("select apto, idapto from ingruma2;");
+    const [rows] = await pool.query(`select apto, idapto from ${ingruma};`);
     const resultArray = rows.map(row => {
       return {
+        ingruma: ingruma,
         apto: row.apto.toString(), // Convirtiendo el buffer a cadena
         idapto: row.idapto.toString(), // Convirtiendo el buffer a cadena
       };
@@ -37,10 +39,10 @@ app.get('/', async (req, res) => {
   }
 });
 
-app.get('/getAptoById', async (req, res) => {
+app.post('/getAptoById/:id/:ingruma', async (req, res) => {
+  const { id, ingruma } = req.params;
   try {
-    const id = req.query.idApto;
-    const queryResult = await pool.query(`select * from ingruma2 where idapto='${id}';`);
+    const queryResult = await pool.query(`select * from ${ingruma} where idapto='${id}';`);
     const result = queryResult[0];
 
     res.send(JSON.stringify(result));
@@ -50,11 +52,11 @@ app.get('/getAptoById', async (req, res) => {
   }
 });
 
-app.put('/changeName/:id/:newName', async (req, res) => {
-  const { id, newName } = req.params;
+app.put('/changeName/:id/:newName/:ingruma', async (req, res) => {
+  const { id, newName, ingruma } = req.params;
 
   try {
-    const result = await pool.query('update ingruma2 set apto = ? where idapto = ?', [newName, id]);
+    const result = await pool.query(`update ${ingruma} set apto = ? where idapto = ?`, [newName, id]);
     console.log('esta entrando');
     res.send('correcto');
   } catch (error) {
@@ -64,11 +66,11 @@ app.put('/changeName/:id/:newName', async (req, res) => {
 });
 
 
-app.put('/changeProductAmount/:id/:product/:amount', async (req, res) => {
-  const { id, product, amount } = req.params;
+app.put('/changeProductAmount/:id/:product/:amount/:ingruma', async (req, res) => {
+  const { id, product, amount, ingruma } = req.params;
 
   try {
-    const result = await pool.query(`update ingruma2 set ${product} = ? where idapto = ?`, [amount, id]);
+    const result = await pool.query(`update ${ingruma} set ${product} = ? where idapto = ?`, [amount, id]);
     console.log('esta entrando');
     res.send('correcto');
   } catch (error) {
@@ -77,9 +79,10 @@ app.put('/changeProductAmount/:id/:product/:amount', async (req, res) => {
   }
 });
 
-app.get('/redistributionI2', async (req, res) => {
+app.get('/redistribution/:ingruma', async (req, res) => {
+  const { ingruma } = req.params;
   try {
-    const result = await pool.query("SELECT * FROM ingruma2;");
+    const result = await pool.query(`SELECT * FROM ${ingruma};`);
     res.send(JSON.stringify(result[0]));
   } catch (error) {
     console.error(error);
@@ -87,11 +90,36 @@ app.get('/redistributionI2', async (req, res) => {
   }
 });
 
-app.post('/addApto/:nombre/:torre/:ingruma', async (req, res) => {
-  const { nombre, torre, ingruma} = req.params;
+
+
+app.post('/addApto/:nombre/:torre/:ingruma/:tabla', async (req, res) => {
+  const { nombre, torre, ingruma, tabla } = req.params;
+  if(tabla == 'todos'){
+    try {
+      const result = await pool.query(`insert into ${tabla} (apto,idapto) values ('${nombre}','${nombre}.${torre}.${ingruma}');`);
+      res.send('correcto');
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error en la consulta');
+    }
+  } else {
+    try {
+      const result = await pool.query(`insert into ${tabla} (apto,idapto) values (${nombre},'${nombre}.${torre}.${ingruma}');`);
+      res.send('correcto');
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error en la consulta');
+    }
+  }
+});
+
+
+app.delete('/deleteApto/:id/:tabla', async (req, res) => {
+  const { id, tabla } = req.params;
 
   try {
-    const result = await pool.query(`insert into ingruma2 (apto,idapto) values (${nombre},'${nombre}.${torre}.${ingruma}');`);
+    const result = await pool.query(`delete from ${tabla} where idapto = '${id}';`);
+    console.log('esta eliminando');
     res.send('correcto');
   } catch (error) {
     console.error(error);
