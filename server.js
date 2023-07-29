@@ -1,5 +1,6 @@
 import { PORT } from './config.js'
 import { pool } from './db.js'
+import { DB_NAME } from './config.js';
 
 import express from 'express';
 import cors from 'cors';
@@ -19,7 +20,7 @@ app.use(
 );
 
 
-// consulta inicial 
+// consulta inicial <-- obtenemos los apartamentos del ingruma que hacemos la peticion 
 app.post('/:ingruma', async (req, res) => {
   const {ingruma} = req.params;
   try {
@@ -39,6 +40,7 @@ app.post('/:ingruma', async (req, res) => {
   }
 });
 
+// API para obtener un apartamento en especifico
 app.post('/getAptoById/:id/:ingruma', async (req, res) => {
   const { id, ingruma } = req.params;
   try {
@@ -123,6 +125,44 @@ app.delete('/deleteApto/:id/:tabla', async (req, res) => {
     res.send('correcto');
   } catch (error) {
     console.error(error);
+    res.status(500).send('Error en la consulta');
+  }
+});
+
+app.get('/getProducts/:ingruma', async (req, res) => {
+  const { ingruma } = req.params;
+  try {
+    const result = await pool.query(`
+    SELECT COLUMN_NAME AS numero FROM 
+    information_schema.columns WHERE 
+    table_schema = '${DB_NAME}' 
+    AND 
+    table_name = '${ingruma}';`);
+    res.send(JSON.stringify(result[0]));
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error en la consulta');
+  }
+});
+
+app.delete('/deleteColumnProduct/:producto/:ingruma', async (req, res) => {
+  const { producto, ingruma } = req.params;
+  try {
+    const result = await pool.query(`alter table ${ingruma} DROP COLUMN ${producto};`);
+    res.send('ELIMINACION HECHA')
+  } catch(error) {
+    console.log(error);
+    res.status(500).send('Error en la consulta');
+  }
+});
+
+app.post('/addColumnProduct/:producto/:ingruma', async (req, res) => {
+  const { producto, ingruma } = req.params;
+  try {
+    const result = await pool.query(`alter table ${ingruma} add (${producto} varchar(60) );`);
+    res.send('añadido')
+  } catch(error) {
+    console.log(error);
     res.status(500).send('Error en la consulta');
   }
 });
