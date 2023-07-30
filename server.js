@@ -159,7 +159,7 @@ app.delete('/deleteColumnProduct/:producto/:ingruma', async (req, res) => {
 app.post('/addColumnProduct/:producto/:ingruma', async (req, res) => {
   const { producto, ingruma } = req.params;
   try {
-    const result = await pool.query(`alter table ${ingruma} add (${producto} varchar(60) );`);
+    const result = await pool.query(`alter table ${ingruma} add (${producto} INT default 0);`);
     res.send('añadido')
   } catch(error) {
     console.log(error);
