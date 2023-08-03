@@ -15,7 +15,6 @@ app.use(express.json())
 app.use(
   cors({
     origin: "https://lusanchezmo.github.io", // allow requests only from this origin
-    origin: "http://localhost:3000"
   })
 );
 
