@@ -1,4 +1,4 @@
-// import { PORT } from './config.js'
+import { PORT } from './config.js'
 import { pool } from './db.js'
 import { DB_NAME } from './config.js';
 
@@ -9,7 +9,6 @@ import cors from 'cors';
 //const cors = require('cors');
 
 const app = express();
-const PORT = process.env.PORT || 5000
 
 app.use(express.json())
 
