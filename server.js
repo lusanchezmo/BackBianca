@@ -14,7 +14,8 @@ app.use(express.json())
 
 app.use(
   cors({
-    origin: "https://lusanchezmo.github.io/FrontBianca", // allow requests only from this origin
+    //origin: "http://localhost:3000", // allow requests only from this origin
+    origin: "https://lusanchezmo.github.io", // allow requests only from this origin
   })
 );
 
@@ -31,7 +32,7 @@ app.post('/:ingruma', async (req, res) => {
         idapto: row.idapto.toString(), // Convirtiendo el buffer a cadena
       };
     });
-
+    console.log(JSON.stringify(resultArray));
     res.send(JSON.stringify(resultArray));
   } catch (error) {
     console.error(error);
