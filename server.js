@@ -106,7 +106,7 @@ app.post('/addApto/:nombre/:torre/:ingruma/:tabla', async (req, res) => {
     }
   } else {
     try {
-      const result = await pool.query(`insert into ${tabla} (apto,idapto) values (${nombre},'${nombre}.${torre}.${ingruma}');`);
+      const result = await pool.query(`insert into ${tabla} (apto,idapto) values ('${nombre}','${nombre}.${torre}.${ingruma}');`);
       res.send('correcto');
     } catch (error) {
       console.error(error);
